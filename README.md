@@ -1,6 +1,4 @@
-# NodeServer-TypeScript
-NodeJS服务端 - typescript版
-----
+# NodeJS服务端 - typescript版
 
 运行项目前,先安装TypeScript
 
