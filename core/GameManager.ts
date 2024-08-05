@@ -13,7 +13,7 @@ let eventFunc: Function[] = []
 //可调用类对象存储
 let classMap: { [key: string]: any } = {}
 //Websocket服务端对象
-let Server
+let Server: WebSocketServer
 //setInterval返回值,可用于关闭循环
 let loopResult: any
 // 存储事件和对应的处理函数
