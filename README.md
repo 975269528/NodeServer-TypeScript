@@ -6,7 +6,7 @@
 
 `npm install -g typescript`
 
-编译TS到JS的命令为,编译后的文件在 `dist` 目录中
+编译TS到JS的命令, 编译后的文件在 `dist` 目录中
 
 `npx tsc`
 
