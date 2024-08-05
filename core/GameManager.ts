@@ -36,8 +36,12 @@ export const GameManager = {
         
         Server.on('connection', (ws, req) => {
             
+            //客户端地址
+            const clientAddress = req.socket.remoteAddress
+            //客户端端口
+            //const clientPort = req.socket.remotePort
             
-            console.log("用户[" + req.headers.connection + "] 进入连接");
+            console.log("用户[" + clientAddress + "] 进入连接");
             
             ws.on('message', (msg) => {
                 try {
@@ -45,19 +49,18 @@ export const GameManager = {
                     console.log('message收到的原始消息', msg.toString())
                     let {className, method, data} = JSON.parse(msg.toString())
                     //调用已注册方法
-                    let tag = new Struct(req.headers.connection, ws, className, method)
+                    let tag = new Struct(clientAddress, ws, className, method)
                     this.call(tag, className, method, data)
-                    
                 } catch (e) {
                     console.log(e)
                 }
             })
             ws.on('close', () => {
                 this.unsubscribe2(ws)
-                console.log('close用户断开连接' + req.headers.connection);
+                console.log('close用户断开连接' + clientAddress);
             })
             ws.on('error', (err) => {
-                console.log('error用户异常断开' + req.headers.connection);
+                console.log('error用户异常断开' + clientAddress);
                 console.log(err);
             })
         })
@@ -201,7 +204,6 @@ export const GameManager = {
         try {
             if (!events[eventName]) return;
             console.log('publish 发布事件:', eventName, data)
-            
             events[eventName].forEach((client) => {
                 client.send(JSON.stringify({
                     eventName: eventName,
@@ -216,7 +218,7 @@ export const GameManager = {
     }
 }
 
-//标识结构
+//tag 标识结构
 export class Struct {
     fromUser: any
     ws: any
