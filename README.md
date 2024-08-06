@@ -1,4 +1,4 @@
-# NodeJS服务端 - typescript版
+# Node服务端 - typescript版
 
 注意 请把 `.env` 前缀的文件放在编译后的文件根目录
 
