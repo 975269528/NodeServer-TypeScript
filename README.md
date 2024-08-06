@@ -6,25 +6,11 @@
 
     npm install -g typescript
 
-tsconfig.json 配置如下
-
-```javascript
-{
-    "compilerOptions": {
-        "target": "es2016",
-        "module": "ESNext",
-        "rootDir": "./",
-        "moduleResolution": "node",
-        "outDir": "./dist",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true
-    }
-}
-```
 
 编译TS到JS的命令, 编译后的文件在 `dist` 目录中
 
     npx tsc
 
+运行项目命令
+
+    npm run dev
