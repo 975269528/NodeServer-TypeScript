@@ -1,17 +1,13 @@
 import {WebSocketServer} from "ws";
-import {readdir} from 'fs/promises'
-import {fileURLToPath, pathToFileURL} from 'url';
-import {dirname, join} from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+// 该文件会在dev的时候自动生成,不要手动修改
+// @ts-ignore
+import Models from "./Models";
 
 let eventLoop = false
 //事件循环函数存储
 let eventFunc: Function[] = []
 //可调用类对象存储
-let classMap: { [key: string]: any } = {}
+let classMap: { [key: string]: any } = Models;
 //Websocket服务端对象
 let Server: WebSocketServer
 //setInterval返回值,可用于关闭循环
@@ -20,10 +16,10 @@ let loopResult: any
 let events: { [key: string]: any[] } = {}
 
 //游戏服务管理器
-export const GameManager = {
+export class GameManager {
     //启动服务器
-    run: function () {
-        let port: number = parseInt(process.env.WEBSOCKET_PORT || '', 10)
+    static run() {
+        let port: number = parseInt(process.env.WEBSOCKET_PORT || '');
         if (!isNaN(port)) {
             // 如果成功解析为整数，则使用该端口创建 WebSocketServer
             Server = new WebSocketServer({port: port})
@@ -64,49 +60,25 @@ export const GameManager = {
                 console.log(err);
             })
         })
-    },
-    
-    //注册可调用类
-    reg: async function () {
-        //使用fs遍历api目录中js文件
-        const apiDir = join(__dirname, '..', 'api'); // 根据实际情况修改目录路径
-        try {
-            const files = await readdir(apiDir);
-            for (const file of files) {
-                if (file.endsWith('.js')) {
-                    const modulePath: URL = pathToFileURL(join(apiDir, file))
-                    try {
-                        const module = await import(modulePath.href);
-                        // 假设模块中导出了一个类或对象，根据实际情况调整
-                        const instance = new module.default(); // 如果是默认导出，或者根据实际情况获取具名导出
-                        // 使用 instance 进行你的操作，例如加入一个数组中等
-                        classMap[instance.constructor.name] = instance
-                        console.log('已加载可调用模块: ', instance.constructor.name)
-                    } catch (err) {
-                        console.error(`加载可调用模块失败 ${modulePath}:`, err);
-                    }
-                }
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    },
+    }
     
     //调用类方法且传递参数
-    call: function (tag: Struct, className: string, method: string, data: any) {
+    static call(tag: Struct, className: string, method: string, data: any) {
         //判断类方法是否存在
         try {
             if (typeof classMap[className][method] === 'function') {
                 //调用类方法传递参数
                 classMap[className][method](tag, data)
+            } else {
+                console.log('调用类方法失败:', className, method)
             }
         } catch (e) {
             console.log('call发生错误:' + e)
         }
-    },
+    }
     
     //发送消息到客户端
-    send: function (tag: Struct, data: any) {
+    static send(tag: Struct, data: any) {
         try {
             tag.ws.send(JSON.stringify({
                 eventName: 0,
@@ -117,10 +89,10 @@ export const GameManager = {
         } catch (e) {
             console.log(e)
         }
-    },
+    }
     
     //开启事件循环 delay = 间隔毫秒
-    openEventLoop: function (delay: number) {
+    static openEventLoop(delay: number) {
         //如果已开启则忽略操作
         if (!eventLoop) {
             //限制一下,防止设置过快,1秒60帧约等于16毫秒间隔,可以用了
@@ -133,36 +105,36 @@ export const GameManager = {
                 })
             }, delay)
         }
-    },
+    }
     
     //关闭事件循环
-    closeEventLoop: function () {
+    static closeEventLoop() {
         //判断循环是否已开启
         if (eventLoop) {
             clearInterval(loopResult)
             eventLoop = false
         }
-    },
+    }
     
     //添加定时循环函数
-    addEventLoopFunc: function (handler: Function) {
+    static addEventLoopFunc(handler: Function) {
         //检查是否已存在,不存在则添加
         if (!eventFunc.includes(handler)) {
             eventFunc.push(handler)
         }
-    },
+    }
     
     //删除定时循环函数
-    removeEventLoopFunc: function (handler: Function) {
+    static removeEventLoopFunc(handler: Function) {
         //查找要删除的函数,如果不存在则返回 -1,否则删除指定元素
         let index = eventFunc.indexOf(handler)
         if (index !== -1) {
             eventFunc.splice(index, 1)
         }
-    },
+    }
     
     // 订阅事件
-    subscribe: function (eventName: string, client: WebSocket) {
+    static subscribe(eventName: string, client: WebSocket) {
         try {
             if (!events[eventName]) {
                 events[eventName] = [];
@@ -176,20 +148,20 @@ export const GameManager = {
         } catch (e) {
             console.log('subscribe 订阅事件发生错误:' + e)
         }
-    },
+    }
     
     // 取消订阅事件
-    unsubscribe: function (eventName: string, client: any) {
+    static unsubscribe(eventName: string, client: any) {
         try {
             if (!events[eventName]) return;
             events[eventName] = events[eventName].filter(obj => obj !== client);
         } catch (e) {
             console.log('unsubscribe 取消订阅事件发生错误:', e)
         }
-    },
+    }
     
     //取消订阅事件2
-    unsubscribe2: function (client: any) {
+    static unsubscribe2(client: any) {
         try {
             Object.keys(events).forEach(eventName => {
                 events[eventName] = events[eventName].filter(obj => obj !== client);
@@ -197,10 +169,10 @@ export const GameManager = {
         } catch (e) {
             console.log('unsubscribe2 执行发生错误:' + e)
         }
-    },
+    }
     
     // 发布事件
-    publish: function (eventName: string, data: any) {
+    static publish(eventName: string, data: any) {
         try {
             if (!events[eventName]) return;
             console.log('publish 发布事件:', eventName, data)
