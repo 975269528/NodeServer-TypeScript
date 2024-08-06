@@ -1,11 +1,19 @@
 {
   "type": "module",
+  "scripts": {
+    "dev": "esno build/dev-runner.ts"
+  },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
     "dotenv": "^16.4.5",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.12"
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/ws": "^8.5.12",
+    "esno": "^4.7.0",
+    "rollup": "^4.20.0",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "typescript": "^5.5.4"
   }
 }
