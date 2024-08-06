@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import {GameManager} from "./core/GameManager.js";
+import {GameManager} from "./core/GameManager";
 
 dotenv.config()
 

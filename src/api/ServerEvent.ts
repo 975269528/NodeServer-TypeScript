@@ -1,4 +1,4 @@
-import {GameManager, Struct} from "../core/GameManager.js";
+import {GameManager, Struct} from "../core/GameManager";
 
 export default class ServerEvent {
     constructor() {
